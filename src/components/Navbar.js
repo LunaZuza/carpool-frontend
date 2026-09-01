@@ -16,7 +16,7 @@ function Navbar({ user, onLogout }) {
   return (
     <nav style={{ padding: '20px 40px 10px 40px' }}>
       <div 
-        className="neu-card"
+        className="neu-card nav-container"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -44,7 +44,7 @@ function Navbar({ user, onLogout }) {
             <span style={{ fontSize: 26 }}>🚗</span> Carpool
           </Link>
           
-          <div style={{ display: 'flex', gap: 12, marginLeft: 16 }}>
+          <div className="nav-links" style={{ display: 'flex', gap: 12, marginLeft: 16 }}>
             <Link 
               to="/" 
               className={isActive('/') ? 'neu-inset' : ''}

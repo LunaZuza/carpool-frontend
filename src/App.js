@@ -7,10 +7,10 @@ import Login from './pages/Login';
 import AuthSuccess from './pages/AuthSuccess';
 import CreateTrip from './pages/CreateTrip';
 import MyTrips from './pages/MyTrips';
+import Profile from './pages/Profile'; // 1. นำเข้าหน้า Profile
 import api from './services/api';
 
 function App() {
-  // แก้ไขการแตกตัวแปร Array ให้ถูกต้อง (เติมสัญลักษณ์ , เพื่อข้าม setCookie)
   const [cookies, , removeCookie] = useCookies(['token']);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,6 @@ function App() {
           setUser(res.data);
         })
         .catch(() => {
-          // ลบ Cookie อย่างถูกต้องเมื่อ Token หมดอายุหรือใช้งานไม่ได้
           removeCookie('token', { path: '/' });
           setUser(null);
         })
@@ -46,13 +45,19 @@ function App() {
   return (
     <BrowserRouter>
       {isAuthenticated && <Navbar user={user} onLogout={handleLogout} />}
-    <Routes>
-  <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
-  <Route path="/auth-success" element={<AuthSuccess />} />
-  <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/login" replace />} />
-  <Route path="/create-trip" element={isAuthenticated ? <CreateTrip /> : <Navigate to="/login" replace />} />
-  <Route path="/my-trips" element={isAuthenticated ? <MyTrips /> : <Navigate to="/login" replace />} />
-</Routes>
+      <Routes>
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
+        <Route path="/auth-success" element={<AuthSuccess />} />
+        <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/login" replace />} />
+        <Route path="/create-trip" element={isAuthenticated ? <CreateTrip /> : <Navigate to="/login" replace />} />
+        <Route path="/my-trips" element={isAuthenticated ? <MyTrips /> : <Navigate to="/login" replace />} />
+        
+        {/* 2. เพิ่ม Route สำหรับหน้าโปรไฟล์ผู้ใช้ */}
+        <Route 
+          path="/profile/:id" 
+          element={isAuthenticated ? <Profile currentUser={user} /> : <Navigate to="/login" replace />} 
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
