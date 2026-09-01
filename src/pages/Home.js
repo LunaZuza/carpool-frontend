@@ -13,6 +13,7 @@ function Home() {
   const fetchTrips = async () => {
     try {
       const res = await api.get('/trips');
+      console.log('Trips Data Received:', res.data); // ดูโครงสร้างข้อมูลจริงใน F12 Console
       setTrips(res.data);
     } catch (err) {
       console.error(err);
@@ -44,19 +45,18 @@ function Home() {
 
       <div className="grid-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
         {trips.map((trip) => {
-          // ดึงค่าด้วยชื่อคอลัมน์ที่เป็นไปได้ทั้งหมดในฐานข้อมูล
-          const origin = trip.origin || trip.start_location || trip.from_location || trip.pickup || 'ไม่ระบุต้นทาง';
-          const destination = trip.destination || trip.end_location || trip.to_location || trip.dropoff || 'ไม่ระบุปลายทาง';
-          
-          const rawPrice = trip.price ?? trip.price_per_seat ?? trip.fare ?? trip.cost ?? 0;
-          const priceNum = Number(rawPrice);
+          // เช็กคีย์ราคาจากทุกชื่อที่เป็นไปได้ในฐานข้อมูล
+          const rawPrice = trip.price ?? trip.price_per_seat ?? trip.seat_price ?? trip.amount ?? trip.cost ?? trip.price_per_person;
+          const priceNum = parseFloat(rawPrice);
+
+          const origin = trip.origin || trip.start_location || trip.from_location || 'ไม่ระบุต้นทาง';
+          const destination = trip.destination || trip.end_location || trip.to_location || 'ไม่ระบุปลายทาง';
 
           const availSeats = Number(trip.available_seats ?? trip.seats_available ?? trip.seats_left ?? 0);
-          let totalSeats = Number(trip.seats ?? trip.total_seats ?? trip.max_seats ?? trip.capacity ?? 0);
-          if (totalSeats < availSeats) totalSeats = availSeats;
+          const totalSeats = Number(trip.seats ?? trip.total_seats ?? trip.max_seats ?? trip.capacity ?? 0);
 
-          const driverId = trip.driver_id ?? trip.user_id ?? trip.created_by ?? trip.owner_id;
-          const driverName = trip.driver_name || trip.creator_name || trip.full_name || trip.name || 'ผู้สร้างทริป';
+          const driverId = trip.driver_id ?? trip.user_id ?? trip.created_by;
+          const driverName = trip.driver_name || trip.creator_name || trip.full_name || 'ผู้สร้างทริป';
 
           return (
             <div key={trip.id} className="neu-card neu-card-hover" style={{ padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -64,7 +64,7 @@ function Home() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                   <h3 style={{ fontSize: 20, fontWeight: 700 }}>{destination}</h3>
                   <span className="neu-inset" style={{ padding: '6px 12px', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
-                    💰 {isNaN(priceNum) ? '0.00' : priceNum.toFixed(2)} ฿ / คน
+                    💰 {!isNaN(priceNum) ? priceNum.toFixed(2) : '0.00'} ฿ / คน
                   </span>
                 </div>
 
