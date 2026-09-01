@@ -14,11 +14,23 @@ function Profile({ currentUser }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await api.get(`/users/profile/${id}`);
-        setProfile(res.data);
-        setBio(res.data.bio || '');
+        let res;
+        // รองรับรูปแบบ Route ของ Backend ทั้ง 3 แบบ เพื่อป้องกัน 404 Error
+        try {
+          res = await api.get(`/users/profile/${id}`);
+        } catch (err1) {
+          try {
+            res = await api.get(`/users/${id}`);
+          } catch (err2) {
+            res = await api.get(`/profile/${id}`);
+          }
+        }
+        
+        const data = res.data.user || res.data;
+        setProfile(data);
+        setBio(data.bio || '');
       } catch (err) {
-        console.error(err);
+        console.error('ไม่สามารถดึงข้อมูลโปรไฟล์ได้:', err);
       } finally {
         setLoading(false);
       }
@@ -48,18 +60,18 @@ function Profile({ currentUser }) {
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt={profile.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
-            <span style={{ fontSize: 40, fontWeight: 800 }}>{profile.full_name?.charAt(0)}</span>
+            <span style={{ fontSize: 40, fontWeight: 800 }}>{(profile.full_name || profile.name || 'U').charAt(0)}</span>
           )}
         </div>
 
-        <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 4 }}>{profile.full_name}</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 4 }}>{profile.full_name || profile.name}</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>{profile.email}</p>
 
         {/* ระบบคะแนนดาว */}
         <div className="neu-inset" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 20px', borderRadius: 999, marginBottom: 28 }}>
           <span style={{ color: '#F59E0B', fontSize: 18 }}>⭐</span>
-          <span style={{ fontWeight: 800, fontSize: 16 }}>{profile.avg_rating} / 5.0</span>
-          <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>({profile.total_reviews} รีวิว)</span>
+          <span style={{ fontWeight: 800, fontSize: 16 }}>{profile.avg_rating || '5.0'} / 5.0</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>({profile.total_reviews || 0} รีวิว)</span>
         </div>
 
         {/* ส่วนแสดง / แก้ไข Bio */}
@@ -78,7 +90,7 @@ function Profile({ currentUser }) {
                 rows="4"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="เขียนแนะนำตัวเองสั้นๆ เช่น ชอบฟังเพลงสากล ชอบเดินทางสงบๆ..."
+                placeholder="เขียนแนะนำตัวเองสั้นๆ..."
                 style={{ resize: 'none', marginBottom: 12 }}
               />
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>

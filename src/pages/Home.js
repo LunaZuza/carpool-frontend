@@ -44,18 +44,25 @@ function Home() {
 
       <div className="grid-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
         {trips.map((trip) => {
-          // ดึงและแปลงค่าความปลอดภัยป้องกันบัค NaN / undefined
-          const priceNum = Number(trip.price ?? trip.price_per_seat ?? 0);
-          const maxSeats = trip.seats ?? trip.max_seats ?? trip.capacity ?? 0;
-          const availSeats = trip.available_seats ?? trip.seats_left ?? maxSeats;
-          const driverId = trip.driver_id ?? trip.user_id ?? trip.creator_id;
-          const driverName = trip.driver_name || trip.creator_name || trip.full_name || 'ผู้สร้างทริป';
+          // ดึงค่าด้วยชื่อคอลัมน์ที่เป็นไปได้ทั้งหมดในฐานข้อมูล
+          const origin = trip.origin || trip.start_location || trip.from_location || trip.pickup || 'ไม่ระบุต้นทาง';
+          const destination = trip.destination || trip.end_location || trip.to_location || trip.dropoff || 'ไม่ระบุปลายทาง';
+          
+          const rawPrice = trip.price ?? trip.price_per_seat ?? trip.fare ?? trip.cost ?? 0;
+          const priceNum = Number(rawPrice);
+
+          const availSeats = Number(trip.available_seats ?? trip.seats_available ?? trip.seats_left ?? 0);
+          let totalSeats = Number(trip.seats ?? trip.total_seats ?? trip.max_seats ?? trip.capacity ?? 0);
+          if (totalSeats < availSeats) totalSeats = availSeats;
+
+          const driverId = trip.driver_id ?? trip.user_id ?? trip.created_by ?? trip.owner_id;
+          const driverName = trip.driver_name || trip.creator_name || trip.full_name || trip.name || 'ผู้สร้างทริป';
 
           return (
             <div key={trip.id} className="neu-card neu-card-hover" style={{ padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 700 }}>{trip.destination}</h3>
+                  <h3 style={{ fontSize: 20, fontWeight: 700 }}>{destination}</h3>
                   <span className="neu-inset" style={{ padding: '6px 12px', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
                     💰 {isNaN(priceNum) ? '0.00' : priceNum.toFixed(2)} ฿ / คน
                   </span>
@@ -63,7 +70,7 @@ function Home() {
 
                 <div className="neu-inset-deep" style={{ padding: 16, marginBottom: 20 }}>
                   <p style={{ fontSize: 14, marginBottom: 8, color: 'var(--text-primary)' }}>
-                    📍 <strong>เส้นทาง:</strong> {trip.origin} → {trip.destination}
+                    📍 <strong>เส้นทาง:</strong> {origin} → {destination}
                   </p>
                   <p style={{ fontSize: 14, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
                     👤 ผู้สร้าง: 
@@ -88,7 +95,7 @@ function Home() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>
-                  💺 ที่นั่งว่าง: {availSeats} / {maxSeats}
+                  💺 ที่นั่งว่าง: {availSeats} / {totalSeats}
                 </span>
                 <button 
                   onClick={() => handleJoinTrip(trip.id)} 
