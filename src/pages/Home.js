@@ -30,30 +30,61 @@ function Home() {
     }
   };
 
-  if (loading) return <div style={{ textAlign: 'center', marginTop: 50 }}>กำลังโหลด...</div>;
+  if (loading) return (
+    <div style={{ textAlign: 'center', marginTop: 100, fontSize: 18, color: 'var(--text-muted)' }}>
+      กำลังโหลดข้อมูลทริป...
+    </div>
+  );
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
-      <h1>🚗 ทริปแชร์ค่ารถ</h1>
+    <div style={{ maxWidth: 1000, margin: '40px auto', padding: '0 20px' }}>
+      <div style={{ marginBottom: 36, textAlign: 'center' }}>
+        <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8 }}>🚗 ทริปแชร์ค่ารถ</h1>
+        <p style={{ color: 'var(--text-muted)' }}>ค้นหาและร่วมเดินทางไปยังสถานที่ต่างๆ ด้วยกัน</p>
+      </div>
+
       {trips.length === 0 ? (
-        <p>ยังไม่มีทริปในขณะนี้</p>
+        <div className="neu-card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+          ยังไม่มีทริปในขณะนี้
+        </div>
       ) : (
-        trips.map((trip) => (
-          <div key={trip.id} style={{ border: '1px solid #ddd', padding: 15, marginBottom: 15, borderRadius: 8 }}>
-            <h3>{trip.event_name}</h3>
-            <p>📍 {trip.start_location} → {trip.end_location}</p>
-            <p>👤 สร้างโดย: {trip.creator_name}</p>
-            <p>💺 ที่นั่งว่าง: {trip.available_seats}/{trip.total_seats}</p>
-            <p>💰 {trip.cost_per_seat} บาท/คน</p>
-            <button
-              onClick={() => joinTrip(trip.id)}
-              disabled={trip.available_seats === 0}
-              style={{ padding: '8px 16px', background: trip.available_seats > 0 ? '#007bff' : '#ccc', color: 'white', border: 'none', borderRadius: 4 }}
-            >
-              {trip.available_seats > 0 ? 'เข้าร่วม' : 'เต็มแล้ว'}
-            </button>
-          </div>
-        ))
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(440px, 1fr))', gap: 28 }}>
+          {trips.map((trip) => (
+            <div key={trip.id} className="neu-card neu-card-hover" style={{ padding: 28 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                <h2 style={{ fontSize: 22, fontWeight: 700 }}>{trip.event_name}</h2>
+                <div className="neu-inset" style={{ padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
+                  💰 {trip.cost_per_seat} ฿ / คน
+                </div>
+              </div>
+
+              <div className="neu-inset" style={{ padding: 16, borderRadius: 18, marginBottom: 20 }}>
+                <div style={{ fontSize: 15, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <span>📍</span> <strong>เส้นทาง:</strong> {trip.start_location} → {trip.end_location}
+                </div>
+                {trip.creator_name && (
+                  <div style={{ fontSize: 14, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span>👤</span> <strong>ผู้สร้าง:</strong> {trip.creator_name}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>
+                  💺 ที่นั่งว่าง: <span style={{ color: trip.available_seats > 0 ? 'var(--accent-secondary)' : '#E53E3E', fontSize: 16 }}>{trip.available_seats}</span> / {trip.total_seats}
+                </div>
+                <button
+                  onClick={() => joinTrip(trip.id)}
+                  disabled={trip.available_seats === 0}
+                  className={trip.available_seats > 0 ? 'neu-btn-primary' : 'neu-btn'}
+                  style={{ opacity: trip.available_seats > 0 ? 1 : 0.6 }}
+                >
+                  {trip.available_seats > 0 ? 'เข้าร่วมทริป' : 'ที่นั่งเต็มแล้ว'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -16,43 +16,53 @@ function Login() {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      background: '#f0f2f5'
+      padding: 20
     }}>
-      <div style={{
-        background: 'white',
-        padding: 40,
-        borderRadius: 8,
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        maxWidth: 400,
-        width: '100%',
-        textAlign: 'center'
-      }}>
-        <h1 style={{ fontSize: 48, marginBottom: 10 }}>🚗</h1>
-        <h2>Carpool</h2>
-        <p style={{ color: '#666', marginBottom: 30 }}>แชร์ค่ารถไปอีเวนต์</p>
+      <div 
+        className="neu-card" 
+        style={{
+          padding: '50px 40px',
+          maxWidth: 440,
+          width: '100%',
+          textAlign: 'center'
+        }}
+      >
+        <div 
+          className="neu-inset-deep" 
+          style={{
+            width: 90,
+            height: 90,
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px auto',
+            fontSize: 44
+          }}
+        >
+          🚗
+        </div>
+
+        <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 8 }}>Carpool</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: 16, marginBottom: 36 }}>
+          แชร์ค่าเดินทาง ไปอีเวนต์กับเพื่อนๆ
+        </p>
 
         {error && (
-          <div style={{ background: '#fee', color: '#c00', padding: 10, borderRadius: 4, marginBottom: 20 }}>
+          <div className="neu-inset" style={{ color: '#E53E3E', padding: 12, borderRadius: 14, marginBottom: 24, fontSize: 14, fontWeight: 500 }}>
             {error === 'auth_failed' && 'การเข้าสู่ระบบล้มเหลว กรุณาลองอีกครั้ง'}
-            {error === 'google_auth_failed' && 'ไม่สามารถเข้าสู่ระบบด้วย Google กรุณาลองอีกครั้ง'}
+            {error === 'google_auth_failed' && 'ไม่สามารถเข้าสู่ระบบด้วย Google'}
           </div>
         )}
 
         <button
           onClick={handleGoogleLogin}
+          className="neu-btn"
           style={{
             width: '100%',
-            padding: '12px',
-            background: '#4285f4',
-            color: 'white',
-            border: 'none',
-            borderRadius: 4,
+            padding: '14px 20px',
             fontSize: 16,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10
+            fontWeight: 700
           }}
         >
           <svg width="20" height="20" viewBox="0 0 48 48">

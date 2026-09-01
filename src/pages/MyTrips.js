@@ -31,28 +31,40 @@ function MyTrips() {
     }
   };
 
-  if (loading) return <div style={{ textAlign: 'center', marginTop: 50 }}>กำลังโหลด...</div>;
+  if (loading) return <div style={{ textAlign: 'center', marginTop: 100, color: 'var(--text-muted)' }}>กำลังโหลด...</div>;
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
-      <h1>📋 ทริปที่ฉันสร้าง</h1>
+    <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 20px' }}>
+      <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 28 }}>📋 ทริปที่ฉันสร้าง</h1>
       {trips.length === 0 ? (
-        <p>คุณยังไม่ได้สร้างทริปใดๆ</p>
+        <div className="neu-card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+          คุณยังไม่ได้สร้างทริปใดๆ
+        </div>
       ) : (
-        trips.map((trip) => (
-          <div key={trip.id} style={{ border: '1px solid #ddd', padding: 15, marginBottom: 15, borderRadius: 8 }}>
-            <h3>{trip.event_name}</h3>
-            <p>📍 {trip.start_location} → {trip.end_location}</p>
-            <p>💺 ที่นั่งว่าง: {trip.available_seats}/{trip.total_seats}</p>
-            <p>💰 {trip.cost_per_seat} บาท/คน</p>
-            <p>สถานะ: {trip.status === 'open' ? '🟢 เปิดรับ' : '🔴 ปิดแล้ว'}</p>
-            {trip.status === 'open' && (
-              <button onClick={() => closeTrip(trip.id)} style={{ padding: '6px 16px', background: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>
-                ปิดทริป
-              </button>
-            )}
-          </div>
-        ))
+        <div style={{ display: 'grid', gap: 20 }}>
+          {trips.map((trip) => (
+            <div key={trip.id} className="neu-card" style={{ padding: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{trip.event_name}</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 10 }}>📍 {trip.start_location} → {trip.end_location}</p>
+                <div style={{ display: 'flex', gap: 12, fontSize: 14 }}>
+                  <span className="neu-inset" style={{ padding: '4px 12px', borderRadius: 999 }}>💺 ว่าง {trip.available_seats}/{trip.total_seats}</span>
+                  <span className="neu-inset" style={{ padding: '4px 12px', borderRadius: 999 }}>💰 {trip.cost_per_seat} ฿</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <span style={{ fontWeight: 700, color: trip.status === 'open' ? 'var(--accent-secondary)' : '#E53E3E' }}>
+                  {trip.status === 'open' ? '🟢 เปิดรับสมัคร' : '🔴 ปิดทริปแล้ว'}
+                </span>
+                {trip.status === 'open' && (
+                  <button onClick={() => closeTrip(trip.id)} className="neu-btn-danger">
+                    ปิดทริป
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

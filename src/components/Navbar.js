@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar({ user, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     document.cookie = 'token=; path=/; max-age=0';
@@ -10,38 +11,114 @@ function Navbar({ user, onLogout }) {
     navigate('/login');
   };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <nav style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '14px 24px',
-      background: '#2c3e50',
-      color: 'white',
-      fontSize: 16,
-      width: '100%'
-    }}>
-      <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', fontSize: 20 }}>🚗 Carpool</Link>
-        <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>ทริปทั้งหมด</Link>
-        <Link to="/my-trips" style={{ color: 'white', textDecoration: 'none' }}>ทริปของฉัน</Link>
-        <Link to="/create-trip" style={{ color: 'white', textDecoration: 'none' }}>สร้างทริป</Link>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
-        {user && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {user.avatar_url && (
-              <img src={user.avatar_url} alt={user.full_name} style={{ width: 32, height: 32, borderRadius: '50%' }} />
-            )}
-            {user.full_name}
-          </span>
-        )}
-        <button 
-          onClick={handleLogout} 
-          style={{ padding: '8px 16px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 14 }}
-        >
-          ออกจากระบบ
-        </button>
+    <nav style={{ padding: '20px 40px 10px 40px' }}>
+      <div 
+        className="neu-card"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 28px',
+          borderRadius: 24,
+          maxWidth: 1200,
+          margin: '0 auto'
+        }}
+      >
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+          <Link 
+            to="/" 
+            style={{ 
+              color: 'var(--text-primary)', 
+              textDecoration: 'none', 
+              fontWeight: 800, 
+              fontSize: 22,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontFamily: 'Plus Jakarta Sans'
+            }}
+          >
+            <span style={{ fontSize: 26 }}>🚗</span> Carpool
+          </Link>
+          
+          <div style={{ display: 'flex', gap: 12, marginLeft: 16 }}>
+            <Link 
+              to="/" 
+              className={isActive('/') ? 'neu-inset' : ''}
+              style={{ 
+                color: isActive('/') ? 'var(--accent)' : 'var(--text-muted)', 
+                textDecoration: 'none',
+                fontWeight: 700,
+                padding: '8px 16px',
+                borderRadius: 14,
+                transition: 'all 0.2s ease'
+              }}
+            >
+              ทริปทั้งหมด
+            </Link>
+            <Link 
+              to="/my-trips" 
+              className={isActive('/my-trips') ? 'neu-inset' : ''}
+              style={{ 
+                color: isActive('/my-trips') ? 'var(--accent)' : 'var(--text-muted)', 
+                textDecoration: 'none',
+                fontWeight: 700,
+                padding: '8px 16px',
+                borderRadius: 14,
+                transition: 'all 0.2s ease'
+              }}
+            >
+              ทริปของฉัน
+            </Link>
+            <Link 
+              to="/create-trip" 
+              className={isActive('/create-trip') ? 'neu-inset' : ''}
+              style={{ 
+                color: isActive('/create-trip') ? 'var(--accent)' : 'var(--text-muted)', 
+                textDecoration: 'none',
+                fontWeight: 700,
+                padding: '8px 16px',
+                borderRadius: 14,
+                transition: 'all 0.2s ease'
+              }}
+            >
+              + สร้างทริป
+            </Link>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {user && (
+            <div 
+              className="neu-inset" 
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 8px', borderRadius: 999 }}
+            >
+              {user.avatar_url ? (
+                <img 
+                  src={user.avatar_url} 
+                  alt={user.full_name} 
+                  style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} 
+                />
+              ) : (
+                <div 
+                  className="neu-card" 
+                  style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}
+                >
+                  {user.full_name?.charAt(0)}
+                </div>
+              )}
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
+                {user.full_name}
+              </span>
+            </div>
+          )}
+          <button onClick={handleLogout} className="neu-btn" style={{ padding: '8px 18px', fontSize: 14 }}>
+            ออกจากระบบ
+          </button>
+        </div>
       </div>
     </nav>
   );
