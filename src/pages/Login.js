@@ -1,18 +1,9 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 function Login() {
-  const navigate = useNavigate();
-  const [cookies] = useCookies(['token']);
   const [searchParams] = useSearchParams();
   const error = searchParams.get('error');
-
-  useEffect(() => {
-    if (cookies.token) {
-      navigate('/');
-    }
-  }, [cookies.token, navigate]);
 
   const handleGoogleLogin = () => {
     const apiUrl = process.env.REACT_APP_API_URL || 'https://carpool-backend-67hn.onrender.com/api';
