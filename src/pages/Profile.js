@@ -12,20 +12,20 @@ function Profile({ currentUser }) {
   const isOwnProfile = currentUser && currentUser.id === parseInt(id);
 
   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get(`/users/profile/${id}`);
+        setProfile(res.data);
+        setBio(res.data.bio || '');
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProfile();
   }, [id]);
-
-  const fetchProfile = async () => {
-    try {
-      const res = await api.get(`/users/profile/${id}`);
-      setProfile(res.data);
-      setBio(res.data.bio || '');
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSaveBio = async () => {
     try {
@@ -87,7 +87,7 @@ function Profile({ currentUser }) {
               </div>
             </div>
           ) : (
-            <p style={{ color: profile.bio ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: 14, lineHeight: 1.6, whitespace: 'pre-line' }}>
+            <p style={{ color: profile.bio ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-line' }}>
               {profile.bio || 'ยังไม่มีคำบรรยายตัวเอง'}
             </p>
           )}
