@@ -92,28 +92,33 @@ function Navbar({ user, onLogout }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {user && (
-            <div 
-              className="neu-inset" 
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 8px', borderRadius: 999 }}
+            <Link 
+              to={`/profile/${user.id}`} 
+              style={{ textDecoration: 'none' }}
             >
-              {user.avatar_url ? (
-                <img 
-                  src={user.avatar_url} 
-                  alt={user.full_name} 
-                  style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} 
-                />
-              ) : (
-                <div 
-                  className="neu-card" 
-                  style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}
-                >
-                  {user.full_name?.charAt(0)}
-                </div>
-              )}
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                {user.full_name}
-              </span>
-            </div>
+              <div 
+                className="neu-inset" 
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 8px', borderRadius: 999, cursor: 'pointer' }}
+              >
+                {user.avatar_url ? (
+                  <img 
+                    src={user.avatar_url} 
+                    alt={user.full_name} 
+                    style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} 
+                  />
+                ) : (
+                  <div 
+                    className="neu-card" 
+                    style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}
+                  >
+                    {user.full_name?.charAt(0)}
+                  </div>
+                )}
+                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  {user.full_name}
+                </span>
+              </div>
+            </Link>
           )}
           <button onClick={handleLogout} className="neu-btn" style={{ padding: '8px 18px', fontSize: 14 }}>
             ออกจากระบบ
