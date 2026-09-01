@@ -15,7 +15,8 @@ function Login() {
   }, [cookies.token, navigate]);
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    const apiUrl = process.env.REACT_APP_API_URL || 'https://carpool-backend-67hn.onrender.com/api';
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   return (
