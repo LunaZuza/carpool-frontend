@@ -6,7 +6,7 @@ function Navbar({ user, onLogout }) {
   const location = useLocation();
 
   const handleLogout = () => {
-    document.cookie = 'token=; path=/; max-age=0';
+    localStorage.removeItem('token');
     onLogout();
     navigate('/login');
   };
@@ -15,7 +15,7 @@ function Navbar({ user, onLogout }) {
 
   return (
     <nav style={{ padding: '20px 40px 10px 40px' }}>
-      <div 
+      <div
         className="neu-card nav-container"
         style={{
           display: 'flex',
@@ -24,65 +24,65 @@ function Navbar({ user, onLogout }) {
           padding: '12px 28px',
           borderRadius: 24,
           maxWidth: 1200,
-          margin: '0 auto'
+          margin: '0 auto',
         }}
       >
         <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-          <Link 
-            to="/" 
-            style={{ 
-              color: 'var(--text-primary)', 
-              textDecoration: 'none', 
-              fontWeight: 800, 
+          <Link
+            to="/"
+            style={{
+              color: 'var(--text-primary)',
+              textDecoration: 'none',
+              fontWeight: 800,
               fontSize: 22,
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              fontFamily: 'Plus Jakarta Sans'
+              fontFamily: 'Plus Jakarta Sans',
             }}
           >
-            <span style={{ fontSize: 26 }}>🚗</span> Carpool
+            <span style={{ fontSize: 26 }}>🚗</span> Iko Share
           </Link>
-          
+
           <div className="nav-links" style={{ display: 'flex', gap: 12, marginLeft: 16 }}>
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className={isActive('/') ? 'neu-inset' : ''}
-              style={{ 
-                color: isActive('/') ? 'var(--accent)' : 'var(--text-muted)', 
+              style={{
+                color: isActive('/') ? 'var(--accent)' : 'var(--text-muted)',
                 textDecoration: 'none',
                 fontWeight: 700,
                 padding: '8px 16px',
                 borderRadius: 14,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
             >
               ทริปทั้งหมด
             </Link>
-            <Link 
-              to="/my-trips" 
+            <Link
+              to="/my-trips"
               className={isActive('/my-trips') ? 'neu-inset' : ''}
-              style={{ 
-                color: isActive('/my-trips') ? 'var(--accent)' : 'var(--text-muted)', 
+              style={{
+                color: isActive('/my-trips') ? 'var(--accent)' : 'var(--text-muted)',
                 textDecoration: 'none',
                 fontWeight: 700,
                 padding: '8px 16px',
                 borderRadius: 14,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
             >
               ทริปของฉัน
             </Link>
-            <Link 
-              to="/create-trip" 
+            <Link
+              to="/create-trip"
               className={isActive('/create-trip') ? 'neu-inset' : ''}
-              style={{ 
-                color: isActive('/create-trip') ? 'var(--accent)' : 'var(--text-muted)', 
+              style={{
+                color: isActive('/create-trip') ? 'var(--accent)' : 'var(--text-muted)',
                 textDecoration: 'none',
                 fontWeight: 700,
                 padding: '8px 16px',
                 borderRadius: 14,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
             >
               + สร้างทริป
@@ -92,23 +92,20 @@ function Navbar({ user, onLogout }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {user && (
-            <Link 
-              to={`/profile/${user.id}`} 
-              style={{ textDecoration: 'none' }}
-            >
-              <div 
-                className="neu-inset" 
+            <Link to={`/profile/${user.id}`} style={{ textDecoration: 'none' }}>
+              <div
+                className="neu-inset"
                 style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 8px', borderRadius: 999, cursor: 'pointer' }}
               >
                 {user.avatar_url ? (
-                  <img 
-                    src={user.avatar_url} 
-                    alt={user.full_name} 
-                    style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} 
+                  <img
+                    src={user.avatar_url}
+                    alt={user.full_name}
+                    style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
                   />
                 ) : (
-                  <div 
-                    className="neu-card" 
+                  <div
+                    className="neu-card"
                     style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}
                   >
                     {user.full_name?.charAt(0)}

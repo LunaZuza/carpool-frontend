@@ -23,7 +23,6 @@ function MyTrips({ currentUser }) {
     }
   };
 
-  // ลบทริป
   const handleDeleteTrip = async (tripId) => {
     if (!window.confirm('คุณแน่ใจหรือไม่ที่จะลบทริปนี้อย่างถาวร?')) return;
     try {
@@ -35,7 +34,6 @@ function MyTrips({ currentUser }) {
     }
   };
 
-  // ดึงข้อความแชท
   const openChat = async (trip) => {
     setActiveChatTrip(trip);
     try {
@@ -46,13 +44,12 @@ function MyTrips({ currentUser }) {
     }
   };
 
-  // ส่งข้อความแชท
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
     try {
       const res = await api.post(`/trips/${activeChatTrip.id}/messages`, { message: newMessage });
-      setMessages([...messages, { ...res.data, full_name: currentUser.full_name, avatar_url: currentUser.avatar_url }]);
+      setMessages([...messages, { ...res.data, full_name: currentUser?.full_name, avatar_url: currentUser?.avatar_url }]);
       setNewMessage('');
     } catch (err) {
       alert('ส่งข้อความล้มเหลว');
@@ -64,7 +61,7 @@ function MyTrips({ currentUser }) {
   return (
     <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 20px' }}>
       <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 28 }}>📋 ทริปที่ฉันสร้าง</h1>
-      
+
       {trips.length === 0 ? (
         <div className="neu-card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
           คุณยังไม่ได้สร้างทริปใดๆ
@@ -75,8 +72,11 @@ function MyTrips({ currentUser }) {
             <div key={trip.id} className="neu-card" style={{ padding: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                 <div>
-                  <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{trip.event_name}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {trip.start_location} → {trip.end_location}</p>
+                  <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{trip.destination || 'ไม่ระบุปลายทาง'}</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {trip.origin} → {trip.destination}</p>
+                  <p style={{ color: 'var(--accent)', fontSize: 14, fontWeight: 700, marginTop: 6 }}>
+                    💰 {Number(trip.price || 0).toFixed(2)} ฿ / คน · 💺 เหลือ {trip.available_seats} / {trip.seats}
+                  </p>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={() => openChat(trip)} className="neu-btn" style={{ padding: '8px 14px', fontSize: 13 }}>
@@ -92,16 +92,18 @@ function MyTrips({ currentUser }) {
         </div>
       )}
 
-      {/* Modal แชทกลุ่ม Neumorphism */}
       {activeChatTrip && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, zIndex: 1000 }}>
           <div className="neu-card" style={{ width: '100%', maxWidth: 500, height: 600, padding: 24, display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700 }}>💬 แชทกลุ่ม: {activeChatTrip.event_name}</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 700 }}>💬 แชทกลุ่ม: {activeChatTrip.destination}</h3>
               <button onClick={() => setActiveChatTrip(null)} className="neu-btn" style={{ padding: '4px 10px', fontSize: 12 }}>ปิด</button>
             </div>
 
             <div className="neu-inset-deep" style={{ flex: 1, padding: 16, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, borderRadius: 20, marginBottom: 16 }}>
+              {messages.length === 0 && (
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: 20 }}>ยังไม่มีข้อความ</div>
+              )}
               {messages.map((m) => {
                 const isMe = m.user_id === currentUser?.id;
                 return (

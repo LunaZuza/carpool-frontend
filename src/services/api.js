@@ -1,20 +1,19 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://carpool-backend-67hn.onrender.com/api';
+// ตั้งค่า REACT_APP_API_URL ในไฟล์ .env หรือ env ของ Vercel เพื่อชี้ไปยัง Backend จริง
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+// แนบ JWT Token ไปกับทุก request ผ่าน Authorization header
 api.interceptors.request.use((config) => {
-  const cookies = document.cookie.split(';');
-  const tokenCookie = cookies.find(c => c.trim().startsWith('token='));
-  if (tokenCookie) {
-    const token = tokenCookie.split('=')[1];
+  const token = localStorage.getItem('token');
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

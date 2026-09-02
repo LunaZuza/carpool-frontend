@@ -13,7 +13,6 @@ function Home() {
   const fetchTrips = async () => {
     try {
       const res = await api.get('/trips');
-      console.log('Trips Data Received:', res.data); // ดูโครงสร้างข้อมูลจริงใน F12 Console
       setTrips(res.data);
     } catch (err) {
       console.error(err);
@@ -24,11 +23,11 @@ function Home() {
 
   const handleJoinTrip = async (tripId) => {
     try {
-      await api.post(`/trips/${tripId}/join`);
-      alert('เข้าร่วมทริปเรียบร้อยแล้ว');
+      const res = await api.post(`/trips/${tripId}/join`);
+      alert(res.data.message || 'เข้าร่วมทริปเรียบร้อยแล้ว');
       fetchTrips();
     } catch (err) {
-      alert(err.response?.data?.message || err.response?.data?.error || 'เกิดข้อผิดพลาดในการเข้าร่วมทริป');
+      alert(err.response?.data?.error || 'เกิดข้อผิดพลาดในการเข้าร่วมทริป');
     }
   };
 
@@ -43,73 +42,75 @@ function Home() {
         <p style={{ color: 'var(--text-muted)' }}>ค้นหาและร่วมเดินทางไปยังสถานที่ต่างๆ ด้วยกัน</p>
       </div>
 
-      <div className="grid-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
-        {trips.map((trip) => {
-          // เช็กคีย์ราคาจากทุกชื่อที่เป็นไปได้ในฐานข้อมูล
-          const rawPrice = trip.price ?? trip.price_per_seat ?? trip.seat_price ?? trip.amount ?? trip.cost ?? trip.price_per_person;
-          const priceNum = parseFloat(rawPrice);
+      {trips.length === 0 ? (
+        <div className="neu-card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+          ยังไม่มีทริป — กด "+ สร้างทริป" เพื่อเริ่มแชร์ค่ากันเถอะ!
+        </div>
+      ) : (
+        <div className="grid-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
+          {trips.map((trip) => {
+            // แปลงราคาเป็นตัวเลขเสมอ เพื่อป้องกัน NaN
+            const priceNum = Number(trip.price || 0);
+            const availSeats = Number(trip.available_seats ?? 0);
+            const totalSeats = Number(trip.seats ?? 0);
+            const origin = trip.origin || 'ไม่ระบุต้นทาง';
+            const destination = trip.destination || 'ไม่ระบุปลายทาง';
+            const driverId = trip.driver_id;
+            const driverName = trip.driver_name || 'ผู้สร้างทริป';
 
-          const origin = trip.origin || trip.start_location || trip.from_location || 'ไม่ระบุต้นทาง';
-          const destination = trip.destination || trip.end_location || trip.to_location || 'ไม่ระบุปลายทาง';
+            return (
+              <div key={trip.id} className="neu-card neu-card-hover" style={{ padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                    <h3 style={{ fontSize: 20, fontWeight: 700 }}>{destination}</h3>
+                    <span className="neu-inset" style={{ padding: '6px 12px', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
+                      💰 {priceNum.toFixed(2)} ฿ / คน
+                    </span>
+                  </div>
 
-          const availSeats = Number(trip.available_seats ?? trip.seats_available ?? trip.seats_left ?? 0);
-          const totalSeats = Number(trip.seats ?? trip.total_seats ?? trip.max_seats ?? trip.capacity ?? 0);
+                  <div className="neu-inset-deep" style={{ padding: 16, marginBottom: 20 }}>
+                    <p style={{ fontSize: 14, marginBottom: 8, color: 'var(--text-primary)' }}>
+                      📍 <strong>เส้นทาง:</strong> {origin} → {destination}
+                    </p>
+                    <p style={{ fontSize: 14, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      👤 ผู้สร้าง:
+                      {driverId ? (
+                        <Link
+                          to={`/profile/${driverId}`}
+                          style={{
+                            color: 'var(--accent)',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            borderBottom: '1.5px dashed var(--accent)',
+                          }}
+                        >
+                          {driverName}
+                        </Link>
+                      ) : (
+                        <span>{driverName}</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
 
-          const driverId = trip.driver_id ?? trip.user_id ?? trip.created_by;
-          const driverName = trip.driver_name || trip.creator_name || trip.full_name || 'ผู้สร้างทริป';
-
-          return (
-            <div key={trip.id} className="neu-card neu-card-hover" style={{ padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 700 }}>{destination}</h3>
-                  <span className="neu-inset" style={{ padding: '6px 12px', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
-                    💰 {!isNaN(priceNum) ? priceNum.toFixed(2) : '0.00'} ฿ / คน
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>
+                    💺 ที่นั่งว่าง: {availSeats} / {totalSeats}
                   </span>
-                </div>
-
-                <div className="neu-inset-deep" style={{ padding: 16, marginBottom: 20 }}>
-                  <p style={{ fontSize: 14, marginBottom: 8, color: 'var(--text-primary)' }}>
-                    📍 <strong>เส้นทาง:</strong> {origin} → {destination}
-                  </p>
-                  <p style={{ fontSize: 14, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    👤 ผู้สร้าง: 
-                    {driverId ? (
-                      <Link 
-                        to={`/profile/${driverId}`}
-                        style={{ 
-                          color: 'var(--accent)', 
-                          fontWeight: 700, 
-                          textDecoration: 'none',
-                          borderBottom: '1.5px dashed var(--accent)'
-                        }}
-                      >
-                        {driverName}
-                      </Link>
-                    ) : (
-                      <span>{driverName}</span>
-                    )}
-                  </p>
+                  <button
+                    onClick={() => handleJoinTrip(trip.id)}
+                    className="neu-btn-primary"
+                    style={{ padding: '8px 16px', fontSize: 14 }}
+                    disabled={availSeats <= 0}
+                  >
+                    {availSeats > 0 ? 'เข้าร่วมทริป' : 'เต็มแล้ว'}
+                  </button>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>
-                  💺 ที่นั่งว่าง: {availSeats} / {totalSeats}
-                </span>
-                <button 
-                  onClick={() => handleJoinTrip(trip.id)} 
-                  className="neu-btn-primary" 
-                  style={{ padding: '8px 16px', fontSize: 14 }}
-                  disabled={availSeats <= 0}
-                >
-                  {availSeats > 0 ? 'เข้าร่วมทริป' : 'เต็มแล้ว'}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

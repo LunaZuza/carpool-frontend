@@ -1,78 +1,116 @@
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
-function Login() {
-  const [searchParams] = useSearchParams();
-  const error = searchParams.get('error');
+function Login({ onLogin }) {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [form, setForm] = useState({ full_name: '', email: '', password: '', avatar_url: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleGoogleLogin = () => {
-    const apiUrl = process.env.REACT_APP_API_URL || 'https://carpool-backend-67hn.onrender.com/api';
-    window.location.href = `${apiUrl}/auth/google`;
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const switchMode = (nextMode) => {
+    setMode(nextMode);
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const endpoint = mode === 'login' ? '/auth/login' : '/auth/register';
+      const payload =
+        mode === 'login'
+          ? { email: form.email, password: form.password }
+          : form;
+      const res = await api.post(endpoint, payload);
+      localStorage.setItem('token', res.data.token);
+      onLogin(res.data.user);
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.error || 'เกิดข้อผิดพลาด กรุณาลองใหม่');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20
-    }}>
-      <div 
-        className="neu-card" 
-        style={{
-          padding: '50px 40px',
-          maxWidth: 440,
-          width: '100%',
-          textAlign: 'center'
-        }}
-      >
-        <div 
-          className="neu-inset-deep" 
+    <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+      <div className="neu-card" style={{ padding: '44px 36px', maxWidth: 440, width: '100%' }}>
+        <div
+          className="neu-inset-deep"
           style={{
-            width: 90,
-            height: 90,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 24px auto',
-            fontSize: 44
+            width: 84, height: 84, borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px auto', fontSize: 42,
           }}
         >
           🚗
         </div>
 
-        <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 8 }}>Carpool</h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: 16, marginBottom: 36 }}>
-          แชร์ค่าเดินทาง ไปอีเวนต์กับเพื่อนๆ
+        <h1 style={{ fontSize: 30, fontWeight: 800, textAlign: 'center', marginBottom: 4 }}>Iko Share</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: 15, textAlign: 'center', marginBottom: 28 }}>
+          {mode === 'login' ? 'เข้าสู่ระบบเพื่อแชร์ค่าเดินทาง' : 'สมัครสมาชิกเพื่อเริ่มแชร์ค่ารถ'}
         </p>
 
         {error && (
-          <div className="neu-inset" style={{ color: '#E53E3E', padding: 12, borderRadius: 14, marginBottom: 24, fontSize: 14, fontWeight: 500 }}>
-            {error === 'auth_failed' && 'การเข้าสู่ระบบล้มเหลว กรุณาลองอีกครั้ง'}
-            {error === 'google_auth_failed' && 'ไม่สามารถเข้าสู่ระบบด้วย Google'}
+          <div className="neu-inset" style={{ color: '#E53E3E', padding: 12, borderRadius: 14, marginBottom: 20, fontSize: 14, fontWeight: 500 }}>
+            {error}
           </div>
         )}
 
-        <button
-          onClick={handleGoogleLogin}
-          className="neu-btn"
-          style={{
-            width: '100%',
-            padding: '14px 20px',
-            fontSize: 16,
-            fontWeight: 700
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 48 48">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.97-5.97z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/>
-          </svg>
-          เข้าสู่ระบบด้วย Google
-        </button>
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
+          {mode === 'register' && (
+            <div>
+              <label style={{ display: 'block', fontWeight: 700, marginBottom: 8, fontSize: 14 }}>ชื่อ-นามสกุล *</label>
+              <input className="neu-input" name="full_name" value={form.full_name} onChange={handleChange} required placeholder="เช่น สมชาย ใจดี" />
+            </div>
+          )}
+
+          <div>
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: 8, fontSize: 14 }}>อีเมล *</label>
+            <input className="neu-input" type="email" name="email" value={form.email} onChange={handleChange} required placeholder="you@example.com" />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: 8, fontSize: 14 }}>รหัสผ่าน *</label>
+            <input className="neu-input" type="password" name="password" value={form.password} onChange={handleChange} required placeholder="อย่างน้อย 6 ตัวอักษร" />
+          </div>
+
+          {mode === 'register' && (
+            <div>
+              <label style={{ display: 'block', fontWeight: 700, marginBottom: 8, fontSize: 14 }}>ลิงก์รูปโปรไฟล์ (ไม่บังคับ)</label>
+              <input className="neu-input" name="avatar_url" value={form.avatar_url} onChange={handleChange} placeholder="https://.../avatar.jpg" />
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} className="neu-btn-primary" style={{ marginTop: 8, padding: 14, fontSize: 16 }}>
+            {loading ? 'กำลังดำเนินการ...' : mode === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'var(--text-muted)' }}>
+          {mode === 'login' ? (
+            <>
+              ยังไม่มีบัญชี?{' '}
+              <button onClick={() => switchMode('register')} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
+                สมัครสมาชิก
+              </button>
+            </>
+          ) : (
+            <>
+              มีบัญชีอยู่แล้ว?{' '}
+              <button onClick={() => switchMode('login')} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
+                เข้าสู่ระบบ
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
